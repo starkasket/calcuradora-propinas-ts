@@ -1,29 +1,34 @@
 import { useCallback } from "react";
 import type { OrderItem } from "../types";
+import {formatCurrency} from '../helpers'
 type OrderTotalProps = {
     order: OrderItem[],
-    tip: number, 
+    tip: number,
     placeOrder: () => void
 }
 
 
-export default function OrderTotal({order, tip, placeOrder}: OrderTotalProps) {
-    const subtotalAmount = useCallback(()=> order.reduce((total,item)=> total+(item.quantity*item.price), 0), [order]);
+export default function OrderTotal({ order, tip, placeOrder }: OrderTotalProps) {
+    const subtotalAmount = useCallback(() => order.reduce((total, item) => total + (item.quantity * item.price), 0), [order]);
     const tipAmount = useCallback(() => subtotalAmount() * tip, [tip, order]);
-    const totalAmount = useCallback(() => subtotalAmount() + tipAmount(), [order,tip])
+    const totalAmount = useCallback(() => subtotalAmount() + tipAmount(), [order, tip])
 
     return (
         <>
-            <div>
-                <h2>Totales y propinas</h2>
-                <p> Propina
-                <span> ${subtotalAmount()}</span>
+            <div className="space-y-3 ">
+                <h2 className="font-black text-2xl">Totales y propinas</h2>
+                <p> Subtotal a pagar: {''}
+                    <span className="font-bold"> {formatCurrency(subtotalAmount())}</span>
                 </p>
-                <p> Total a pagar
-                <span> ${totalAmount()}</span>
+                <p> Propina: {''}
+                    <span className="font-bold"> {formatCurrency(tipAmount())}</span>
+                </p>
+                <p> Total a pagar: {''}
+                    <span className="font-bold"> {formatCurrency(totalAmount())}</span>
                 </p>
             </div>
-            <button onClick={() => placeOrder()}> Guardar Orden </button>
+            <button onClick={() => placeOrder()} className="w-full bg-black p-3 uppercase text-white font-bold mt-10 disabled:opacity-10 "
+                disabled = {totalAmount() === 0}> Guardar Orden </button>
         </>
     )
 }
